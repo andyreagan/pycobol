@@ -1,5 +1,8 @@
 # pycobol
 
+[![CI](https://github.com/andyreagan/pycobol/actions/workflows/ci.yml/badge.svg)](https://github.com/andyreagan/pycobol/actions/workflows/ci.yml)
+[![PyPI version](https://img.shields.io/pypi/v/pycobol)](https://pypi.org/project/pycobol/)
+
 Call COBOL programs as Python functions. Like [maturin](https://github.com/PyO3/maturin) for Rust, but for GnuCOBOL.
 
 **Motivation:** You're migrating COBOL off a mainframe. The programs do real work you want to keep, but they expect VSAM files, DD names, and JCL — none of which exist on Linux/macOS. pycobol wraps `cobc` (GnuCOBOL) so you can:
