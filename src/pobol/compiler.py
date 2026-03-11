@@ -8,10 +8,10 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from pycobol.exceptions import CompileError
+from pobol.exceptions import CompileError
 
 # Default directory for caching compiled binaries
-_CACHE_DIR = Path(tempfile.gettempdir()) / "pycobol_cache"
+_CACHE_DIR = Path(tempfile.gettempdir()) / "pobol_cache"
 
 
 def _source_hash(source_path: Path) -> str:

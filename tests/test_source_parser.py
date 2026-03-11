@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 from textwrap import dedent
 
-from pycobol.source_parser import (
+from pobol.source_parser import (
     strip_mainframe_format,
     parse_cobol_source,
     _extract_selects,
@@ -20,17 +20,31 @@ from pycobol.source_parser import (
 
 
 class TestStripMainframeFormat:
+    """Tests for mainframe source stripping.  We use multi-line samples
+    because detection requires a statistically significant fraction of
+    lines to have sequence numbers and wide columns."""
+
+    MAINFRAME_SAMPLE = (
+        "000100 IDENTIFICATION DIVISION.                                         00010001\n"
+        "000200 PROGRAM-ID. TEST.                                                00020001\n"
+        "000300 ENVIRONMENT DIVISION.                                            00030001\n"
+        "000400 DATA DIVISION.                                                   00040001\n"
+        "000500 PROCEDURE DIVISION.                                              00050001\n"
+        "000600     STOP RUN.                                                    00060001\n"
+    )
+
     def test_strips_sequence_numbers(self):
-        line = "000100 IDENTIFICATION DIVISION.                                         00010001"
-        result = strip_mainframe_format(line)
+        result = strip_mainframe_format(self.MAINFRAME_SAMPLE)
         assert "IDENTIFICATION DIVISION." in result
         assert "000100" not in result
         assert "00010001" not in result
 
     def test_preserves_comment_indicator(self):
-        line = "000610*****************************************************************"
-        result = strip_mainframe_format(line)
-        assert result.strip().startswith("*")
+        src = self.MAINFRAME_SAMPLE + (
+            "000610*****************************************************************00061001\n"
+        )
+        result = strip_mainframe_format(src)
+        assert any(line.strip().startswith("*") for line in result.splitlines())
 
     def test_removes_label_records(self):
         src = "     LABEL RECORDS ARE STANDARD."
@@ -163,7 +177,7 @@ class TestExtractFdRecords:
         records = _extract_fd_records(
             SAMPLE_FILE_SECTION, {"INPUT-FILE", "OUTPUT-FILE"}
         )
-        from pycobol.copybook import parse_copybook
+        from pobol.copybook import parse_copybook
 
         rec_name, rec_src = records["INPUT-FILE"][0]
         cb = parse_copybook(rec_src, name=rec_name)
@@ -246,7 +260,7 @@ class TestRewriteAssigns:
         assert '"myfile.dat"' not in rewritten
 
     def test_skips_ws_path_variable(self):
-        """WS-* path variables (pycobol-native) are left alone."""
+        """WS-* path variables (pobol-native) are left alone."""
         src = dedent("""\
            SELECT MY-FILE ASSIGN TO WS-MY-PATH
                  ORGANIZATION IS SEQUENTIAL.
@@ -422,7 +436,7 @@ MAINFRAME_SYNTHETIC = """\
 000500 DATE-COMPILED.   JANUARY 2026.                                   00050001
 000600 REMARKS.                                                         00060001
 000610*****************************************************************
-000620** Synthetic check-printing program for pycobol test coverage. **
+000620** Synthetic check-printing program for pobol test coverage. **
 000700** Exercises mainframe complexities without proprietary code.   ** 00070001
 000800*****************************************************************
 001000 ENVIRONMENT DIVISION.                                            00100001
@@ -880,9 +894,9 @@ class TestMainframeSynthetic:
 # Quoted-literal variant (simulates a hand-ported GnuCOBOL source)
 # ---------------------------------------------------------------------------
 # When someone has already ported a mainframe program to GnuCOBOL by
-# hardcoding file paths as quoted literals, pycobol should still be able
+# hardcoding file paths as quoted literals, pobol should still be able
 # to discover all file I/O and rewrite the assigns for env-var control.
-# This covers the workflow: mainframe original → manual GnuCOBOL port → pycobol.
+# This covers the workflow: mainframe original → manual GnuCOBOL port → pobol.
 
 GNUCOBOL_PORTED_SYNTHETIC = """\
        IDENTIFICATION DIVISION.
@@ -953,9 +967,9 @@ GNUCOBOL_PORTED_SYNTHETIC = """\
 
 class TestGnucobolPortedSource:
     """Tests for sources that were already hand-ported to GnuCOBOL
-    (quoted-literal assigns, no mainframe artifacts).  pycobol should
+    (quoted-literal assigns, no mainframe artifacts).  pobol should
     still discover all I/O and be able to rewrite assigns for env-var
-    control — so you don't have to re-port the COBOL to use pycobol."""
+    control — so you don't have to re-port the COBOL to use pobol."""
 
     def test_discovers_all_files(self):
         parsed = parse_cobol_source(
@@ -984,7 +998,7 @@ class TestGnucobolPortedSource:
 
     def test_quoted_assigns_are_rewritten(self):
         """Quoted literals like ASSIGN TO \"setup.dat\" are rewritten
-        to WS-PATH env-var mapping so pycobol controls file paths."""
+        to WS-PATH env-var mapping so pobol controls file paths."""
         parsed = parse_cobol_source(
             GNUCOBOL_PORTED_SYNTHETIC, strip_mainframe=False, rewrite_assigns=True
         )

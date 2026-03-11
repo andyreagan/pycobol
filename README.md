@@ -1,11 +1,11 @@
-# pycobol
+# pobol
 
 [![CI](https://github.com/andyreagan/pycobol/actions/workflows/ci.yml/badge.svg)](https://github.com/andyreagan/pycobol/actions/workflows/ci.yml)
-[![PyPI version](https://img.shields.io/pypi/v/pycobol)](https://pypi.org/project/pycobol/)
+[![PyPI version](https://img.shields.io/pypi/v/pobol)](https://pypi.org/project/pobol/)
 
 Call COBOL programs as Python functions. Like [maturin](https://github.com/PyO3/maturin) for Rust, but for GnuCOBOL.
 
-**Motivation:** You're migrating COBOL off a mainframe. The programs do real work you want to keep, but they expect VSAM files, DD names, and JCL — none of which exist on Linux/macOS. pycobol wraps `cobc` (GnuCOBOL) so you can:
+**Motivation:** You're migrating COBOL off a mainframe. The programs do real work you want to keep, but they expect VSAM files, DD names, and JCL — none of which exist on Linux/macOS. pobol wraps `cobc` (GnuCOBOL) so you can:
 
 1. Point it at a `.cbl` file — it parses the source and discovers everything  
 2. Pass Python dicts as input records  
@@ -16,15 +16,15 @@ No copybook transcription, no temp-file juggling, no batch scripts.
 ## Quick Start
 
 ```bash
-uv add pycobol          # or: pip install pycobol
+uv add pobol          # or: pip install pobol
 ```
 
 ### Zero-config mode (auto-discovery)
 
 ```python
-from pycobol import load
+from pobol import load
 
-# pycobol parses the COBOL source, discovers SELECT/FD clauses,
+# pobol parses the COBOL source, discovers SELECT/FD clauses,
 # extracts record layouts, strips mainframe artifacts, compiles, and
 # handles all file I/O automatically.
 report = load("customer_report.cob")
@@ -52,7 +52,7 @@ for rec in result.output_file:
 
 ```python
 # Point at raw mainframe COBOL with sequence numbers, LABEL RECORDS,
-# IBM-370, DD-name assigns — pycobol handles it all:
+# IBM-370, DD-name assigns — pobol handles it all:
 prog = load("check_disbursement.cbl")
 
 print(prog.file_info)
@@ -64,7 +64,7 @@ print(prog.file_info)
 ### Explicit copybooks (optional override)
 
 ```python
-from pycobol import load, parse_copybook
+from pobol import load, parse_copybook
 
 input_cb = parse_copybook("""
     01  INPUT-RECORD.
@@ -108,7 +108,7 @@ report = load(
 
 ## Handling Multiple Record Types
 
-Real mainframe COBOL often has multiple 01-level records under one FD (header, detail, trailer). pycobol discovers all of them:
+Real mainframe COBOL often has multiple 01-level records under one FD (header, detail, trailer). pobol discovers all of them:
 
 ```python
 prog = load("check_disbursement.cbl")

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Demo: call COBOL programs from Python using pycobol.
+"""Demo: call COBOL programs from Python using pobol.
 
 Run from the project root:
     uv run python examples/demo.py
 """
 
 from pathlib import Path
-from pycobol import load, parse_copybook
+from pobol import load, parse_copybook
 
 COBOL_DIR = Path(__file__).parent / "cobol"
 
@@ -39,7 +39,7 @@ def demo_uppercase_auto():
     print("DEMO 3: uppercase.cob — auto-discovered file I/O")
     print("=" * 60)
 
-    # Just point at the .cob file. pycobol parses the source,
+    # Just point at the .cob file. pobol parses the source,
     # discovers SELECT/FD/OPEN, extracts PIC clauses, handles everything.
     upper = load(COBOL_DIR / "uppercase.cob")
 
@@ -68,7 +68,7 @@ def demo_customer_report_auto():
 
     report = load(COBOL_DIR / "customer_report.cob")
 
-    # Show what pycobol discovered from parsing the COBOL source
+    # Show what pobol discovered from parsing the COBOL source
     print(report.file_info)
     print()
 
@@ -97,7 +97,7 @@ def demo_mainframe_parsing():
     print("DEMO 5: Parse mainframe-format COBOL source")
     print("=" * 60)
 
-    from pycobol import parse_cobol_source
+    from pobol import parse_cobol_source
 
     # A small inline example showing mainframe format parsing.
     # In practice you'd point this at your real .cbl files.

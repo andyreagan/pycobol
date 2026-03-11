@@ -1,4 +1,4 @@
-"""Shared fixtures for pycobol tests."""
+"""Shared fixtures for pobol tests."""
 
 import pytest
 from pathlib import Path

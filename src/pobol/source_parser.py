@@ -5,7 +5,7 @@
 3. Strip mainframe artifacts (sequence numbers, LABEL RECORDS, etc.)
 4. Rewrite ASSIGN TO clauses for GnuCOBOL env-var file mapping
 
-This is the "magic" that makes pycobol feel like maturin: you point it at
+This is the "magic" that makes pobol feel like maturin: you point it at
 a mainframe .cbl and it Just Works™.
 """
 
@@ -16,8 +16,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from pycobol.copybook import Copybook, Field, _expand_pic, parse_copybook
-from pycobol.exceptions import CopybookParseError
+from pobol.copybook import Copybook, Field, _expand_pic, parse_copybook
+from pobol.exceptions import CopybookParseError
 
 
 # ---------------------------------------------------------------------------
@@ -56,23 +56,33 @@ def _is_mainframe_source(source: str) -> bool:
     """Heuristically detect if the source uses mainframe fixed format.
 
     Mainframe format has:
-    - Columns 1-6: sequence numbers (digits/spaces)
+    - Columns 1-6: sequence numbers (digits with possible spaces)
     - Column 7: indicator area
     - Columns 8-72: source code
     - Columns 73-80: identification/change markers
 
-    We check a sample of non-empty lines: if most have 6-digit prefixes,
-    it's mainframe format.
+    We require columns 1-6 to contain at least one digit (not just
+    spaces, which would be normal fixed-format COBOL).  We also check
+    for content beyond column 72 as a secondary signal.
     """
     lines = source.splitlines()
     sample = [l for l in lines if l.strip()][:50]
     if not sample:
         return False
-    mainframe_count = sum(
+
+    # Lines where cols 1-6 contain at least one digit (sequence numbers)
+    seq_count = sum(
         1 for l in sample
-        if len(l) >= 7 and re.match(r"^[\d ]{6}[* A-Za-z0-9/-]", l)
+        if len(l) >= 7
+        and re.match(r"^[\d ]{6}", l)
+        and re.search(r"\d", l[:6])
     )
-    return mainframe_count / len(sample) > 0.5
+
+    # Lines that extend beyond column 72 (identification area)
+    wide_count = sum(1 for l in sample if len(l) > 72)
+
+    # Need a significant fraction of lines with sequence numbers
+    return seq_count / len(sample) > 0.3 and wide_count / len(sample) > 0.2
 
 
 def strip_mainframe_format(source: str) -> str:
@@ -157,8 +167,8 @@ def _needs_assign_rewrite(source: str, select_name: str, target: str) -> bool:
     - There's already an ACCEPT ... FROM ENVIRONMENT for this file
 
     Both bare DD-names (``DATAIN``) and quoted literals (``"datain.dat"``)
-    are rewritten to env-var mapping so pycobol can control file paths at
-    runtime.  This means pycobol works identically whether you point it at
+    are rewritten to env-var mapping so pobol can control file paths at
+    runtime.  This means pobol works identically whether you point it at
     the mainframe original or a hand-ported GnuCOBOL version.
     """
     # Working-storage variable — already adapted
@@ -181,7 +191,7 @@ def _rewrite_assigns_for_env(source: str) -> tuple[str, dict[str, str]]:
     """Rewrite SELECT...ASSIGN TO clauses to use GnuCOBOL env-var resolution.
 
     Rewrites both bare DD-names (``DATAIN``) and quoted literals
-    (``"datain.dat"``) so pycobol can control file paths at runtime.
+    (``"datain.dat"``) so pobol can control file paths at runtime.
     Skips working-storage variables (``WS-*``) and files that already
     have ``ACCEPT … FROM ENVIRONMENT`` statements.
 
@@ -229,7 +239,7 @@ def _rewrite_assigns_for_env(source: str) -> tuple[str, dict[str, str]]:
             stmt_indent = "           "
 
         # Add WS path fields before PROCEDURE DIVISION
-        ws_block = f"\n{comment_prefix} PYCOBOL: auto-generated file path fields\n"
+        ws_block = f"\n{comment_prefix} POBOL: auto-generated file path fields\n"
         for ws_name, _ in ws_fields:
             ws_block += f"{ws_indent}01  {ws_name:<30} PIC X(256).\n"
 
@@ -238,7 +248,7 @@ def _rewrite_assigns_for_env(source: str) -> tuple[str, dict[str, str]]:
             rewritten = proc_re.sub(ws_block + r"\n\1", rewritten)
 
         # Add ACCEPT statements after first paragraph label in PROCEDURE DIVISION
-        accept_block = f"\n{comment_prefix} PYCOBOL: load file paths from environment\n"
+        accept_block = f"\n{comment_prefix} POBOL: load file paths from environment\n"
         for ws_name, env_name in ws_fields:
             accept_block += f'{stmt_indent}ACCEPT {ws_name} FROM ENVIRONMENT "{env_name}"\n'
 

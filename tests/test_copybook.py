@@ -1,7 +1,7 @@
 """Tests for the copybook parser and record encoder/decoder."""
 
 import pytest
-from pycobol.copybook import Copybook, Field, parse_copybook, _expand_pic
+from pobol.copybook import Copybook, Field, parse_copybook, _expand_pic
 
 
 # ---------------------------------------------------------------------------

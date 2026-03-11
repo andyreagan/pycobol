@@ -1,5 +1,5 @@
 [project]
-name = "pycobol"
+name = "pobol"
 version = "0.1.0"
 description = "Call COBOL programs as Python functions — file I/O handled for you"
 readme = "README.md"

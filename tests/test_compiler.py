@@ -3,8 +3,8 @@
 import pytest
 from pathlib import Path
 
-from pycobol.compiler import compile_program
-from pycobol.exceptions import CompileError
+from pobol.compiler import compile_program
+from pobol.exceptions import CompileError
 
 
 class TestCompileProgram:

@@ -3,9 +3,9 @@
 Usage
 -----
 
-    from pycobol import load
+    from pobol import load
 
-    # Auto mode: pycobol parses the COBOL source, discovers all files,
+    # Auto mode: pobol parses the COBOL source, discovers all files,
     # extracts record layouts, handles compilation and file I/O.
     prog = load("check_disbursement.cbl")
     print(prog.file_info)  # shows discovered inputs/outputs
@@ -38,10 +38,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from pycobol.compiler import compile_program
-from pycobol.copybook import Copybook
-from pycobol.exceptions import CobolRuntimeError
-from pycobol.source_parser import ParsedSource, parse_cobol_source
+from pobol.compiler import compile_program
+from pobol.copybook import Copybook
+from pobol.exceptions import CobolRuntimeError
+from pobol.source_parser import ParsedSource, parse_cobol_source
 
 
 @dataclass
@@ -238,7 +238,7 @@ class CobolProgram:
         if env:
             run_env.update(env)
 
-        tmpdir = tempfile.mkdtemp(prefix="pycobol_run_")
+        tmpdir = tempfile.mkdtemp(prefix="pobol_run_")
 
         # --- write input files ---
         for kwarg_name, records in file_inputs.items():
@@ -347,7 +347,7 @@ def load(
         prog = load("my_program.cbl")
         result = prog(input_file=[...])
 
-    pycobol will:
+    pobol will:
     - Parse the source to discover all SELECT/FD file descriptors
     - Extract record layouts (PIC clauses) automatically
     - Strip mainframe artifacts (sequence numbers, LABEL RECORDS, etc.)

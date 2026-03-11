@@ -3,8 +3,8 @@
 import pytest
 from pathlib import Path
 
-from pycobol import CobolProgram, load, parse_copybook
-from pycobol.exceptions import CobolRuntimeError
+from pobol import CobolProgram, load, parse_copybook
+from pobol.exceptions import CobolRuntimeError
 
 
 # ---------------------------------------------------------------------------

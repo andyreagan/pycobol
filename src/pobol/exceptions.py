@@ -1,8 +1,8 @@
-"""Exceptions for pycobol."""
+"""Exceptions for pobol."""
 
 
 class PyCobolError(Exception):
-    """Base exception for all pycobol errors."""
+    """Base exception for all pobol errors."""
 
 
 class CompileError(PyCobolError):
