@@ -1,6 +1,6 @@
 [project]
 name = "pobol"
-version = "0.1.1"
+version = "0.1.2"
 description = "Call COBOL programs as Python functions — file I/O handled for you"
 readme = "README.md"
 authors = [

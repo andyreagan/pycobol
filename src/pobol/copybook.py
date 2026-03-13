@@ -111,7 +111,6 @@ class Field:
             # GnuCOBOL default: trailing sign overpunch.
             # Positive: last digit stays 0-9 → {ABCDEFGHI (0-9)
             # Negative: last digit → }JKLMNOPQR (0-9)
-            pos_map = "0123456789"
             # For simplicity we use ASCII sign convention that GnuCOBOL
             # understands when reading DISPLAY fields: just prefix with
             # '-' / '+' — but that changes length.  Instead, use the

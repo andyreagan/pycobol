@@ -65,19 +65,21 @@ def _is_mainframe_source(source: str) -> bool:
     for content beyond column 72 as a secondary signal.
     """
     lines = source.splitlines()
-    sample = [l for l in lines if l.strip()][:50]
+    sample = [line for line in lines if line.strip()][:50]
     if not sample:
         return False
 
     # Lines where cols 1-6 contain at least one digit (sequence numbers)
     seq_count = sum(
         1
-        for l in sample
-        if len(l) >= 7 and re.match(r"^[\d ]{6}", l) and re.search(r"\d", l[:6])
+        for line in sample
+        if len(line) >= 7
+        and re.match(r"^[\d ]{6}", line)
+        and re.search(r"\d", line[:6])
     )
 
     # Lines that extend beyond column 72 (identification area)
-    wide_count = sum(1 for l in sample if len(l) > 72)
+    wide_count = sum(1 for line in sample if len(line) > 72)
 
     # Need a significant fraction of lines with sequence numbers
     return seq_count / len(sample) > 0.3 and wide_count / len(sample) > 0.2
@@ -291,14 +293,7 @@ def _extract_selects(source: str) -> dict[str, str]:
 def _detect_direction(source: str, select_name: str) -> str:
     """Heuristically detect if a file is input, output, or both by looking
     at OPEN statements in the PROCEDURE DIVISION."""
-    # Look for OPEN INPUT <name> or OPEN OUTPUT <name>
-    patterns = [
-        (r"OPEN\s+INPUT\s+[^.]*\b" + re.escape(select_name) + r"\b", "input"),
-        (r"OPEN\s+OUTPUT\s+[^.]*\b" + re.escape(select_name) + r"\b", "output"),
-        (r"OPEN\s+I-O\s+[^.]*\b" + re.escape(select_name) + r"\b", "input-output"),
-        (r"OPEN\s+EXTEND\s+[^.]*\b" + re.escape(select_name) + r"\b", "output"),
-    ]
-    # Also handle multi-file OPEN: OPEN INPUT file1 file2 OUTPUT file3 file4
+    # Handle multi-file OPEN: OPEN INPUT file1 file2 OUTPUT file3 file4
     # We need to check if our name falls between an INPUT/OUTPUT keyword and the next one
     open_re = re.compile(
         r"OPEN\s+((?:(?:INPUT|OUTPUT|I-O|EXTEND)\s+[A-Za-z0-9-]+(?:\s+[A-Za-z0-9-]+)*\s*)+)",
@@ -338,7 +333,6 @@ def _extract_fd_records(
     current_record_name: str | None = None
     current_record_lines: list[str] = []
     in_file_section = False
-    in_working_storage = False
 
     fd_re = re.compile(r"^\s*FD\s+([A-Za-z0-9-]+)", re.IGNORECASE)
     level_01_re = re.compile(r"^\s*01\s+([A-Za-z0-9-]+)", re.IGNORECASE)
