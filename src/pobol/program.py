@@ -34,14 +34,14 @@ from __future__ import annotations
 import os
 import subprocess
 import tempfile
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from pobol.compiler import compile_program
 from pobol.copybook import Copybook
 from pobol.exceptions import CobolRuntimeError
-from pobol.source_parser import ParsedSource, parse_cobol_source
+from pobol.source_parser import parse_cobol_source
 
 
 @dataclass
@@ -163,9 +163,9 @@ class CobolProgram:
             # Write the cleaned source to a temp file for compilation.
             # Use a short name — cobc has a max filename length.
             stem = self.source.stem[:16]
-            self._compile_source = Path(tempfile.mktemp(
-                suffix=".cob", prefix=f"{stem}_"
-            ))
+            self._compile_source = Path(
+                tempfile.mktemp(suffix=".cob", prefix=f"{stem}_")
+            )
             self._compile_source.write_text(self._parsed.cleaned_source)
         else:
             self._compile_source = self.source
@@ -190,7 +190,8 @@ class CobolProgram:
                 lines.append(f"  {name} ({cb.record_length} bytes): {fields}")
 
         unknown = [
-            name for name, fs in self._all_files.items()
+            name
+            for name, fs in self._all_files.items()
             if name not in self.inputs and name not in self.outputs
         ]
         if unknown:
@@ -209,10 +210,7 @@ class CobolProgram:
         Returns dict[select_name → dict[record_name → Copybook]].
         Useful for inspecting multi-record FDs (header/detail/trailer).
         """
-        return {
-            name: fspec.record_layouts
-            for name, fspec in self._all_files.items()
-        }
+        return {name: fspec.record_layouts for name, fspec in self._all_files.items()}
 
     def __call__(
         self,

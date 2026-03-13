@@ -25,6 +25,7 @@ from pobol.exceptions import CopybookParseError
 # PIC parsing helpers
 # ---------------------------------------------------------------------------
 
+
 def _parse_9_part(s: str) -> int:
     """Parse a 9-digit specifier: '9(5)' → 5, '999' → 3, '9' → 1."""
     m = re.match(r"9\((\d+)\)", s)
@@ -96,12 +97,12 @@ class Field:
         """Encode a Python value into fixed-width COBOL display bytes."""
         if self.kind == "alpha":
             s = str(value) if value is not None else ""
-            return s.ljust(self.length)[:self.length].encode("ascii")
+            return s.ljust(self.length)[: self.length].encode("ascii")
 
         # numeric
         if value is None:
             value = 0
-        num = round(float(value) * (10 ** self.decimals))
+        num = round(float(value) * (10**self.decimals))
         negative = num < 0
         num = abs(int(num))
         digits = str(num).zfill(self.length)[-self.length :]
@@ -145,10 +146,10 @@ class Field:
             digit = neg_over.index(last)
             text = text[:-1] + str(digit)
             negative = True
-        elif last == '-':
+        elif last == "-":
             text = text[:-1]
             negative = True
-        elif last == '+':
+        elif last == "+":
             text = text[:-1]
 
         # strip non-digit chars that may be left
@@ -157,7 +158,7 @@ class Field:
         if negative:
             num = -num
         if self.decimals:
-            return num / (10 ** self.decimals)
+            return num / (10**self.decimals)
         return num
 
 

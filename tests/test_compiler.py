@@ -1,7 +1,6 @@
 """Tests for the COBOL compiler wrapper."""
 
 import pytest
-from pathlib import Path
 
 from pobol.compiler import compile_program
 from pobol.exceptions import CompileError

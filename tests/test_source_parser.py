@@ -1,7 +1,5 @@
 """Tests for automatic COBOL source parsing and file discovery."""
 
-import pytest
-from pathlib import Path
 from textwrap import dedent
 
 from pobol.source_parser import (
@@ -381,17 +379,23 @@ FULL_PROGRAM = """\
 
 class TestFullParse:
     def test_discovers_files(self):
-        parsed = parse_cobol_source(FULL_PROGRAM, strip_mainframe=False, rewrite_assigns=False)
+        parsed = parse_cobol_source(
+            FULL_PROGRAM, strip_mainframe=False, rewrite_assigns=False
+        )
         assert "INPUT-FILE" in parsed.files
         assert "OUTPUT-FILE" in parsed.files
 
     def test_discovers_directions(self):
-        parsed = parse_cobol_source(FULL_PROGRAM, strip_mainframe=False, rewrite_assigns=False)
+        parsed = parse_cobol_source(
+            FULL_PROGRAM, strip_mainframe=False, rewrite_assigns=False
+        )
         assert parsed.files["INPUT-FILE"].direction == "input"
         assert parsed.files["OUTPUT-FILE"].direction == "output"
 
     def test_discovers_record_layouts(self):
-        parsed = parse_cobol_source(FULL_PROGRAM, strip_mainframe=False, rewrite_assigns=False)
+        parsed = parse_cobol_source(
+            FULL_PROGRAM, strip_mainframe=False, rewrite_assigns=False
+        )
         in_layouts = parsed.files["INPUT-FILE"].record_layouts
         assert "INPUT-RECORD" in in_layouts
         cb = in_layouts["INPUT-RECORD"]
@@ -400,7 +404,9 @@ class TestFullParse:
         assert cb.record_length == 24
 
     def test_discovers_output_layouts(self):
-        parsed = parse_cobol_source(FULL_PROGRAM, strip_mainframe=False, rewrite_assigns=False)
+        parsed = parse_cobol_source(
+            FULL_PROGRAM, strip_mainframe=False, rewrite_assigns=False
+        )
         out_layouts = parsed.files["OUTPUT-FILE"].record_layouts
         assert "OUTPUT-RECORD" in out_layouts
         cb = out_layouts["OUTPUT-RECORD"]
@@ -976,7 +982,10 @@ class TestGnucobolPortedSource:
             GNUCOBOL_PORTED_SYNTHETIC, strip_mainframe=False, rewrite_assigns=False
         )
         assert set(parsed.files.keys()) == {
-            "PRINT-SETUP", "TXN-DATA-FILE", "CHECK-OUT-FILE", "RECON-FILE"
+            "PRINT-SETUP",
+            "TXN-DATA-FILE",
+            "CHECK-OUT-FILE",
+            "RECON-FILE",
         }
 
     def test_discovers_directions(self):
@@ -1040,5 +1049,3 @@ class TestGnucobolPortedSource:
                 f"Direction mismatch for {name}: "
                 f"{mainframe.files[name].direction} vs {ported.files[name].direction}"
             )
-
-

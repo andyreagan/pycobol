@@ -7,9 +7,9 @@ Call COBOL programs as Python functions. Like [maturin](https://github.com/PyO3/
 
 **Motivation:** You're migrating COBOL off a mainframe. The programs do real work you want to keep, but they expect VSAM files, DD names, and JCL — none of which exist on Linux/macOS. pobol wraps `cobc` (GnuCOBOL) so you can:
 
-1. Point it at a `.cbl` file — it parses the source and discovers everything  
-2. Pass Python dicts as input records  
-3. Get Python dicts back from the output files  
+1. Point it at a `.cbl` file — it parses the source and discovers everything
+2. Pass Python dicts as input records
+3. Get Python dicts back from the output files
 
 No copybook transcription, no temp-file juggling, no batch scripts.
 
@@ -100,7 +100,7 @@ report = load(
 
 1. **Parse source** — discovers SELECT/FD/OPEN clauses, extracts PIC field layouts, detects input vs output files
 2. **Strip mainframe** — removes sequence numbers (cols 1-6), identification (cols 73-80), LABEL RECORDS, RECORDING MODE, BLOCK CONTAINS, fixes SOURCE-COMPUTER
-3. **Rewrite assigns** — converts `ASSIGN TO DATAIN` (DD names) to working-storage paths loaded from `DD_*` environment variables  
+3. **Rewrite assigns** — converts `ASSIGN TO DATAIN` (DD names) to working-storage paths loaded from `DD_*` environment variables
 4. **Compile** — `cobc -x` compiles to a native executable (cached by content hash)
 5. **Write inputs** — your Python dicts are encoded as fixed-width records to temp files
 6. **Run** — the executable runs with `DD_*` env vars pointing to temp files

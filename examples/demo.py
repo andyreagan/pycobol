@@ -6,7 +6,7 @@ Run from the project root:
 """
 
 from pathlib import Path
-from pobol import load, parse_copybook
+from pobol import load
 
 COBOL_DIR = Path(__file__).parent / "cobol"
 
@@ -82,7 +82,7 @@ def demo_customer_report_auto():
 
     print(f"  {result.stdout.strip()}")
     print(f"  {'ID':<8} {'Name':<32} {'Balance':>12} {'Discount':>12}")
-    print(f"  {'-'*8} {'-'*32} {'-'*12} {'-'*12}")
+    print(f"  {'-' * 8} {'-' * 32} {'-' * 12} {'-' * 12}")
     for rec in result.output_file:
         print(
             f"  {rec['out_cust_id']:<8} {rec['out_cust_name']:<32} "
@@ -136,10 +136,14 @@ def demo_mainframe_parsing():
     for name, fspec in parsed.files.items():
         layouts = list(fspec.record_layouts.keys())
         fields_total = sum(len(cb.fields) for cb in fspec.record_layouts.values())
-        print(f"  {fspec.direction:>8} {name:<20} assign={fspec.assign_name:<10} "
-              f"records={len(layouts)} fields={fields_total}")
+        print(
+            f"  {fspec.direction:>8} {name:<20} assign={fspec.assign_name:<10} "
+            f"records={len(layouts)} fields={fields_total}"
+        )
         for rec_name, cb in fspec.record_layouts.items():
-            print(f"           └─ {rec_name} ({cb.record_length} bytes, {len(cb.fields)} fields)")
+            print(
+                f"           └─ {rec_name} ({cb.record_length} bytes, {len(cb.fields)} fields)"
+            )
     print()
 
 

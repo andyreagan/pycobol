@@ -1,12 +1,13 @@
 """Tests for the copybook parser and record encoder/decoder."""
 
 import pytest
-from pobol.copybook import Copybook, Field, parse_copybook, _expand_pic
+from pobol.copybook import parse_copybook, _expand_pic
 
 
 # ---------------------------------------------------------------------------
 # PIC parsing
 # ---------------------------------------------------------------------------
+
 
 class TestExpandPic:
     def test_alpha_parens(self):
@@ -59,7 +60,7 @@ class TestParseCopybook:
 
     def test_offsets(self):
         cb = parse_copybook(SAMPLE_FD)
-        assert cb.fields[1].offset == 6   # after 6-digit ID
+        assert cb.fields[1].offset == 6  # after 6-digit ID
         assert cb.fields[2].offset == 36  # after 6 + 30
 
     def test_record_length(self):
@@ -76,6 +77,7 @@ class TestParseCopybook:
 # ---------------------------------------------------------------------------
 # Encode / Decode
 # ---------------------------------------------------------------------------
+
 
 class TestEncodeDecode:
     @pytest.fixture

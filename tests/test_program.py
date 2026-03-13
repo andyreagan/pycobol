@@ -1,10 +1,8 @@
 """Integration tests: load and call COBOL programs from Python."""
 
 import pytest
-from pathlib import Path
 
-from pobol import CobolProgram, load, parse_copybook
-from pobol.exceptions import CobolRuntimeError
+from pobol import load, parse_copybook
 
 
 # ---------------------------------------------------------------------------

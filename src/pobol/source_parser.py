@@ -14,9 +14,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
 
-from pobol.copybook import Copybook, Field, _expand_pic, parse_copybook
+from pobol.copybook import Copybook, parse_copybook
 from pobol.exceptions import CopybookParseError
 
 
@@ -72,10 +71,9 @@ def _is_mainframe_source(source: str) -> bool:
 
     # Lines where cols 1-6 contain at least one digit (sequence numbers)
     seq_count = sum(
-        1 for l in sample
-        if len(l) >= 7
-        and re.match(r"^[\d ]{6}", l)
-        and re.search(r"\d", l[:6])
+        1
+        for l in sample
+        if len(l) >= 7 and re.match(r"^[\d ]{6}", l) and re.search(r"\d", l[:6])
     )
 
     # Lines that extend beyond column 72 (identification area)
@@ -198,7 +196,7 @@ def _rewrite_assigns_for_env(source: str) -> tuple[str, dict[str, str]]:
     Returns (rewritten_source, mapping of select_name → env_var_name).
     """
     select_re = re.compile(
-        r'(SELECT\s+(?P<sel>[A-Za-z0-9-]+)\s+ASSIGN\s+TO\s+)'
+        r"(SELECT\s+(?P<sel>[A-Za-z0-9-]+)\s+ASSIGN\s+TO\s+)"
         r'(?:EXTERNAL\s+)?(?P<target>[A-Za-z0-9-]+|"[^"]+")',
         re.IGNORECASE,
     )
@@ -217,7 +215,7 @@ def _rewrite_assigns_for_env(source: str) -> tuple[str, dict[str, str]]:
 
         ws_name = f"WS-PATH-{sel_name}"
         ws_fields.append((ws_name, env_name))
-        return f'{m.group(1)}{ws_name}'
+        return f"{m.group(1)}{ws_name}"
 
     rewritten = select_re.sub(_replace_assign, source)
 
@@ -225,7 +223,7 @@ def _rewrite_assigns_for_env(source: str) -> tuple[str, dict[str, str]]:
     if ws_fields:
         # Determine if source is free-format or fixed-format
         is_fixed = any(
-            len(line) >= 7 and line[6] in (' ', '*', '-', '/')
+            len(line) >= 7 and line[6] in (" ", "*", "-", "/")
             for line in rewritten.splitlines()[:20]
             if line.strip()
         )
@@ -243,23 +241,29 @@ def _rewrite_assigns_for_env(source: str) -> tuple[str, dict[str, str]]:
         for ws_name, _ in ws_fields:
             ws_block += f"{ws_indent}01  {ws_name:<30} PIC X(256).\n"
 
-        proc_re = re.compile(r"(^\s*PROCEDURE\s+DIVISION\.)", re.MULTILINE | re.IGNORECASE)
+        proc_re = re.compile(
+            r"(^\s*PROCEDURE\s+DIVISION\.)", re.MULTILINE | re.IGNORECASE
+        )
         if proc_re.search(rewritten):
             rewritten = proc_re.sub(ws_block + r"\n\1", rewritten)
 
         # Add ACCEPT statements after first paragraph label in PROCEDURE DIVISION
         accept_block = f"\n{comment_prefix} POBOL: load file paths from environment\n"
         for ws_name, env_name in ws_fields:
-            accept_block += f'{stmt_indent}ACCEPT {ws_name} FROM ENVIRONMENT "{env_name}"\n'
+            accept_block += (
+                f'{stmt_indent}ACCEPT {ws_name} FROM ENVIRONMENT "{env_name}"\n'
+            )
 
         proc_match = proc_re.search(rewritten)
         if proc_match:
-            after_proc = rewritten[proc_match.end():]
+            after_proc = rewritten[proc_match.end() :]
             para_re = re.compile(r"^(\s*[A-Z][A-Z0-9-]*\.\s*$)", re.MULTILINE)
             para_match = para_re.search(after_proc)
             if para_match:
                 insert_pos = proc_match.end() + para_match.end()
-                rewritten = rewritten[:insert_pos] + accept_block + rewritten[insert_pos:]
+                rewritten = (
+                    rewritten[:insert_pos] + accept_block + rewritten[insert_pos:]
+                )
 
     return rewritten, env_map
 
@@ -272,7 +276,7 @@ def _rewrite_assigns_for_env(source: str) -> tuple[str, dict[str, str]]:
 def _extract_selects(source: str) -> dict[str, str]:
     """Extract SELECT name → ASSIGN TO name mappings."""
     select_re = re.compile(
-        r'SELECT\s+([A-Za-z0-9-]+)\s+ASSIGN\s+TO\s+'
+        r"SELECT\s+([A-Za-z0-9-]+)\s+ASSIGN\s+TO\s+"
         r'(?:EXTERNAL\s+)?([A-Za-z0-9-]+|"[^"]+")',
         re.IGNORECASE,
     )
@@ -307,8 +311,10 @@ def _detect_direction(source: str, select_name: str) -> str:
         for token in open_clause.split():
             upper = token.upper().strip(".")
             if upper in ("INPUT", "OUTPUT", "I-O", "EXTEND"):
-                current_mode = "input" if upper == "INPUT" else (
-                    "output" if upper in ("OUTPUT", "EXTEND") else "input-output"
+                current_mode = (
+                    "input"
+                    if upper == "INPUT"
+                    else ("output" if upper in ("OUTPUT", "EXTEND") else "input-output")
                 )
             elif upper == select_name.upper():
                 return current_mode or "unknown"
@@ -316,7 +322,9 @@ def _detect_direction(source: str, select_name: str) -> str:
     return "unknown"
 
 
-def _extract_fd_records(source: str, select_names: set[str]) -> dict[str, list[tuple[str, str]]]:
+def _extract_fd_records(
+    source: str, select_names: set[str]
+) -> dict[str, list[tuple[str, str]]]:
     """Extract FD sections and their 01-level record definitions.
 
     Returns dict mapping select_name → [(record_name, record_source), ...].
