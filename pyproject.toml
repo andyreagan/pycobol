@@ -6,8 +6,13 @@ readme = "README.md"
 authors = [
     { email = "andy@andyreagan.com" }
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/andyreagan/pobol"
+Repository = "https://github.com/andyreagan/pobol"
+Issues = "https://github.com/andyreagan/pobol/issues"
 
 [build-system]
 requires = ["uv_build>=0.9.30,<0.10.0"]
