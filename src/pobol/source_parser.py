@@ -18,7 +18,6 @@ from pathlib import Path
 from pobol.copybook import Copybook, parse_copybook
 from pobol.exceptions import CopybookParseError
 
-
 # ---------------------------------------------------------------------------
 # Data model for parsed source
 # ---------------------------------------------------------------------------

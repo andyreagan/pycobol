@@ -3,14 +3,13 @@
 from textwrap import dedent
 
 from pobol.source_parser import (
-    strip_mainframe_format,
-    parse_cobol_source,
-    _extract_selects,
     _detect_direction,
     _extract_fd_records,
+    _extract_selects,
     _rewrite_assigns_for_env,
+    parse_cobol_source,
+    strip_mainframe_format,
 )
-
 
 # ---------------------------------------------------------------------------
 # Mainframe format stripping
