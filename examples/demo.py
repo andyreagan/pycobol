@@ -6,6 +6,7 @@ Run from the project root:
 """
 
 from pathlib import Path
+
 from pobol import load
 
 COBOL_DIR = Path(__file__).parent / "cobol"

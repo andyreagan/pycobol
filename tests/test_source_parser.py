@@ -3,14 +3,13 @@
 from textwrap import dedent
 
 from pobol.source_parser import (
-    strip_mainframe_format,
-    parse_cobol_source,
-    _extract_selects,
     _detect_direction,
     _extract_fd_records,
+    _extract_selects,
     _rewrite_assigns_for_env,
+    parse_cobol_source,
+    strip_mainframe_format,
 )
-
 
 # ---------------------------------------------------------------------------
 # Mainframe format stripping
@@ -271,7 +270,7 @@ class TestRewriteAssigns:
                ACCEPT WS-MY-PATH FROM ENVIRONMENT "DD_MY_FILE"
                OPEN INPUT MY-FILE.
         """)
-        rewritten, env_map = _rewrite_assigns_for_env(src)
+        rewritten, _env_map = _rewrite_assigns_for_env(src)
         assert "WS-PATH-MY-FILE" not in rewritten
         assert "WS-MY-PATH" in rewritten
 
@@ -289,7 +288,7 @@ class TestRewriteAssigns:
                ACCEPT WS-TEMP FROM ENVIRONMENT "DD_MY_FILE"
                OPEN INPUT MY-FILE.
         """)
-        rewritten, env_map = _rewrite_assigns_for_env(src)
+        rewritten, _env_map = _rewrite_assigns_for_env(src)
         # The assign is left unchanged because there's already an ACCEPT
         assert "WS-PATH-MY-FILE" not in rewritten
 
@@ -311,7 +310,7 @@ class TestRewriteAssigns:
            MAIN-PARA.
                OPEN INPUT FILE-A FILE-B FILE-C.
         """)
-        rewritten, env_map = _rewrite_assigns_for_env(src)
+        rewritten, _env_map = _rewrite_assigns_for_env(src)
         # FILE-A (bare DD) and FILE-B (quoted) are rewritten
         assert "WS-PATH-FILE-A" in rewritten
         assert "WS-PATH-FILE-B" in rewritten

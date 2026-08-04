@@ -274,7 +274,7 @@ class CobolProgram:
 
         # --- also set env vars for any files we haven't covered ---
         # (files that are both input+output, or unclassified)
-        for dd_name, fspec in self._all_files.items():
+        for dd_name in self._all_files:
             env_var = _fd_env_var(dd_name)
             if env_var not in run_env:
                 path = os.path.join(tmpdir, dd_name.replace("-", "_") + ".dat")
@@ -290,6 +290,7 @@ class CobolProgram:
             text=True,
             env=run_env,
             timeout=timeout,
+            check=False,
         )
 
         # --- read output files ---

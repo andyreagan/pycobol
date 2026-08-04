@@ -69,7 +69,7 @@ def compile_program(
         cmd.extend(extra_flags)
     cmd.append(str(source_path))
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
     if result.returncode != 0:
         raise CompileError(str(source_path), result.returncode, result.stderr)
 

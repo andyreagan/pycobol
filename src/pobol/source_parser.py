@@ -18,7 +18,6 @@ from pathlib import Path
 from pobol.copybook import Copybook, parse_copybook
 from pobol.exceptions import CopybookParseError
 
-
 # ---------------------------------------------------------------------------
 # Data model for parsed source
 # ---------------------------------------------------------------------------
@@ -175,16 +174,13 @@ def _needs_assign_rewrite(source: str, select_name: str, target: str) -> bool:
     if target.upper().startswith("WS-"):
         return False
 
-    # Check if there's already an ACCEPT from environment for this file
+    # Rewrite unless there's already an ACCEPT from environment for this file
     env_name = f"DD_{select_name.replace('-', '_')}"
-    if re.search(
+    return not re.search(
         rf'ACCEPT\s+\S+\s+FROM\s+ENVIRONMENT\s+"{re.escape(env_name)}"',
         source,
         re.IGNORECASE,
-    ):
-        return False
-
-    return True
+    )
 
 
 def _rewrite_assigns_for_env(source: str) -> tuple[str, dict[str, str]]:
@@ -475,7 +471,7 @@ def parse_cobol_source(
 
     # Step 6: Rewrite assigns for env-var mapping
     if rewrite_assigns:
-        final_source, env_map = _rewrite_assigns_for_env(cleaned)
+        final_source, _env_map = _rewrite_assigns_for_env(cleaned)
     else:
         final_source = cleaned
 

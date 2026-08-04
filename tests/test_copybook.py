@@ -1,8 +1,8 @@
 """Tests for the copybook parser and record encoder/decoder."""
 
 import pytest
-from pobol.copybook import parse_copybook, _expand_pic
 
+from pobol.copybook import _expand_pic, parse_copybook
 
 # ---------------------------------------------------------------------------
 # PIC parsing
